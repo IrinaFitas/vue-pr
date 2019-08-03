@@ -12,6 +12,7 @@
       </div>
       <figure class="card-img">
         <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
+        <figcaption>Some caption witch is visible on hover</figcaption>
       </figure>
       <div class="card-info">
         <div class="card-info__likes">
@@ -30,6 +31,12 @@
     </el-card>
   </div>
 </template>
+<script>
+export default {
+  
+}
+</script>
+
 
 <style scoped>
 .container-card {
