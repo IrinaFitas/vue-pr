@@ -11,6 +11,7 @@
     box-sizing: border-box;
     box-shadow: 0 0 3px grey;
     font-weight: bold;
+    font-size: 24px;
   }
 </style>
 
