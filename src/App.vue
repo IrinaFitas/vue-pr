@@ -2,6 +2,19 @@
   <div id="app">
     <app-header></app-header>
     <app-campaign></app-campaign>
+    List
+    Campaign
+    <ul>
+      <li>First Campaign
+        <router-link :to="id"></router-link>
+      </li>
+      localhost:3000/campaigns/1
+      rotue.params.id
+
+      getCampaign(id) {
+        state.campaigns.find(e => e.id === id)
+      }
+    </ul>
   </div>
 </template>
 

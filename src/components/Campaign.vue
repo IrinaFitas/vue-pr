@@ -1,7 +1,7 @@
 <template>
   <div class="campaign-container">
     <header class="campaign-container__header">
-      <span>Campaign Name</span>
+      <span>Random Campaign Name</span>
     </header>
 
     <main class="main">
@@ -42,6 +42,7 @@
 
 <script>
 import Card from './Card';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   components: {
@@ -53,10 +54,17 @@ export default {
       dynamicTags: ["Whatever1", "Whatever2", "Whatever3", "Whatever4"]
     };
   },
+  computed: {
+    ...mapGetters(['campaigns'])
+  },
   methods: {
+    ...mapActions(['getCampaigns']),
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
     }
+  },
+  mounted() {
+    this.getCampaigns();
   }
 }
 </script>
