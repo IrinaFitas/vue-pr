@@ -9,7 +9,8 @@ export const store = new Vuex.Store({
     campaigns: []
   },
   getters: {
-    campaigns: state => state.campaigns
+    campaigns: state => state.campaigns,
+    currentCampaign: state => id => state.campaigns.find(elem => elem.id === id)
   },
   mutations: {
     getCampaigns: (state, payload) => {

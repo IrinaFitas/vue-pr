@@ -1,32 +1,24 @@
 <template>
   <div id="app">
     <app-header></app-header>
-    <app-campaign></app-campaign>
-    List
-    Campaign
-    <ul>
-      <li>First Campaign
-        <router-link :to="id"></router-link>
-      </li>
-      localhost:3000/campaigns/1
-      rotue.params.id
-
-      getCampaign(id) {
-        state.campaigns.find(e => e.id === id)
-      }
-    </ul>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Header from "./components/Header";
-import Campaign from "./components/Campaign";
+import Header from './components/Header';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'app',
   components: {
-    "app-header": Header,
-    "app-campaign": Campaign
+  'app-header': Header
+  },
+  methods: {
+    ...mapActions(['getCampaigns'])
+  },
+  mounted () {
+    this.getCampaigns();
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="campaign-container">
     <header class="campaign-container__header">
-      <span>Random Campaign Name</span>
+      <span>{{ campaign.title }}</span>
     </header>
 
     <main class="main">
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="campaign-cards">
-        <app-card></app-card>
+        <app-card v-for="item in campaign.media" :item="item" :key="item.id"></app-card>
       </div>
     </main>
   </div>
@@ -42,7 +42,6 @@
 
 <script>
 import Card from './Card';
-import { mapGetters, mapActions } from 'vuex';
 
 export default {
   components: {
@@ -55,16 +54,17 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['campaigns'])
-  },
-  methods: {
-    ...mapActions(['getCampaigns']),
-    handleClose(tag) {
-      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    campaign() {
+      return this.$store.getters.currentCampaign(+this.$route.params.id);
     }
   },
   mounted() {
-    this.getCampaigns();
+    console.log(this.campaign.media);
+  },
+  methods: {
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    }
   }
 }
 </script>
@@ -92,6 +92,7 @@ export default {
 
 .campaign-cards {
   display: flex;
+  flex-wrap: wrap;
   padding: 15px 0;
 }
 </style>

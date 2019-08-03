@@ -3,25 +3,25 @@
     <el-card :body-style="{ padding: '0px' }">
       <div slot="header">
         <div class="card-header">
-          <div class="author-image"></div>
+          <div class="author-image" :style="{ backgroundImage: 'url(' + item.author_pic + ')' }"></div>
           <div class="author-info">
-            <p class="author-adress">some@mail.ru</p>
-            <a href="#" class="author-social">Instagram</a href="#">
+            <p class="author-adress">{{ item.author_username }}</p>
+            <a :href="item.link" target="_blank" class="author-social">{{ item.social_network }}</a>
           </div>
         </div>
       </div>
       <figure class="card-img">
-        <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
-        <figcaption>Some caption witch is visible on hover</figcaption>
+        <img :src="item.pic" class="image">
+        <figcaption v-if="showCaption">{{ item.caption }}</figcaption>
       </figure>
       <div class="card-info">
         <div class="card-info__likes">
-          <p>Likes</p>
-          <p>123</p>
+          <p class="card-info__text">Likes</p>
+          <p class="card-info__number">{{ item.likes_number }}</p>
         </div>
         <div class="card-info__comments">
-          <p>Comments</p>
-          <p>456</p>
+          <p class="card-info__text">Comments</p>
+          <p class="card-info__number">{{ item.comments_number }}</p>
         </div>
       </div>
       <div class="card-footer">
@@ -33,14 +33,25 @@
 </template>
 <script>
 export default {
-  
+  props: {
+    item: {
+      required: true,
+      type: Object
+    }
+  },
+  data() {
+    return {
+      showCaption: false
+    };
+  }
 }
 </script>
 
 
 <style scoped>
 .container-card {
-  min-width: 25%;
+  width: 25%;
+  min-width: 300px;
 }
 
 .card-img {
@@ -49,6 +60,7 @@ export default {
 
 .image {
   width: 100%;
+  height: 400px;
 }
 
 .card-info,
@@ -61,6 +73,16 @@ export default {
 .card-info__comments {
   width: 30%;
   text-transform: uppercase;
+}
+
+.card-info__text {
+  text-transform: uppercase;
+  color: grey;
+  font-weight: bold;
+}
+.card-info__number {
+  font-weight: bold;
+  font-size: 30px;
 }
 
 .card-footer {
