@@ -7,6 +7,7 @@
     <main class="main">
       <div class="campaign-container__tags">
         <el-button-group>
+          <el-button :class="{ 'is-active': socialFilter === 'All' }" @click="setSocialFilter('All')">All</el-button>
           <el-button :class="{ 'is-active': socialFilter === 'Instagram' }" @click="setSocialFilter('Instagram')">Instagram</el-button>
           <el-button :class="{ 'is-active': socialFilter === 'Youtube' }" @click="setSocialFilter('Youtube')">Youtube</el-button>
           <el-button :class="{ 'is-active': socialFilter === 'Facebook' }" @click="setSocialFilter('Facebook')">Facebook</el-button>
@@ -46,11 +47,22 @@
         </div>
 
         <div class="campaign-info">
-          <span class="campaign-info__total">{{ campaign.count !== 1 ? `${campaign.count} items total` : `${campaign.count} item total` }}</span>
+          <span class="campaign-info__total">{{ filteredArray.length > 1 ? `${filteredArray.length} items total` : `${filteredArray.length} item total` }}</span>
+
+          <el-pagination
+            v-if="filteredArray.length"
+            @current-change="currentChange($event)"
+            background
+            small
+            layout="prev, pager, next"
+            :page-size="itemsPerPage"
+            :current-page='currentPage'
+            :total="filteredArray.length">
+          </el-pagination>
         </div>
       </div>
       <div class="campaign-cards">
-        <app-card v-for="item in filteredArray" :item="item" :key="item.id" :campaignId="campaign.id"></app-card>
+        <app-card v-for="item in paginatedArray" :item="item" :key="item.id" :campaignId="campaign.id"></app-card>
         <p v-if="!filteredArray.length">Упс! Нет ничего.</p>
       </div>
     </main>
@@ -72,7 +84,10 @@ export default {
       dynamicTags: [],
       socialFilter: null,
       statusFilter: 'pending',
-      caption: false
+      caption: false,
+      currentPage: 1,
+      offset: 1,
+      itemsPerPage: 5
     };
   },
   computed: {
@@ -80,7 +95,10 @@ export default {
       return this.$store.getters.currentCampaign(+this.$route.params.id);
     },
     filteredArray() {
-      if (this.socialFilter && !this.caption) {
+      if (this.socialFilter === 'All' && !this.caption) {
+        return this.campaign.media
+          .filter(e => e.status === this.statusFilter);
+      } else if (this.socialFilter && !this.caption) {
         return this.campaign.media
           .filter(e => e.status === this.statusFilter)
           .filter(e => e.social_network === this.socialFilter);
@@ -89,18 +107,21 @@ export default {
 
         return this.campaign.media
           .filter(e => e.status === this.statusFilter)
-          .filter(e => this.dynamicTags.find(item => e.caption.includes(item)));
+          .filter(e => this.dynamicTags.find(item => e.caption.toLowerCase().includes(item.toLowerCase())));
       } else if (this.socialFilter && this.caption) {
         this.caption = false;
 
         return this.campaign.media
           .filter(e => e.status === this.statusFilter)
           .filter(e => e.social_network === this.socialFilter)
-          .filter(e => this.dynamicTags.find(item => e.caption.includes(item)));
+          .filter(e => this.dynamicTags.find(item => e.caption.toLowerCase().includes(item.toLowerCase())));
       } else {
         return this.campaign.media
           .filter(e => e.status === this.statusFilter);
       }
+    },
+    paginatedArray() {
+      return this.filteredArray.slice(this.offset === 1 ? 0 : (this.offset * this.itemsPerPage) - this.itemsPerPage, this.offset * this.itemsPerPage);
     }
   },
   methods: {
@@ -130,6 +151,9 @@ export default {
       }
       this.inputVisible = false;
       this.inputValue = '';
+    },
+    currentChange(event) {
+      this.offset = event;
     }
   }
 }
@@ -175,6 +199,8 @@ export default {
 }
 
 .campaign-info {
+  display: flex;
+  justify-content: space-between;
   margin-top: 15px;
 }
 
