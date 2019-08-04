@@ -15,6 +15,11 @@ export const store = new Vuex.Store({
   mutations: {
     getCampaigns: (state, payload) => {
       state.campaigns = payload;
+    },
+    changeStatus: (state, { campaignId, cardId, status }) => {
+      const card = state.campaigns.find(elem => elem.id === campaignId).media.find(elem => elem.id === cardId);
+
+      card.status = status;
     }
   },
   actions: {
@@ -22,6 +27,9 @@ export const store = new Vuex.Store({
       const data = campaigns.getCampaigns();
 
       commit("getCampaigns", data);
+    },
+    changeStatus ({ commit }, { campaignId, cardId, status }) {
+      commit("changeStatus", { campaignId, cardId, status });
     }
   }
 });

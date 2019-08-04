@@ -10,8 +10,9 @@
           </div>
         </div>
       </div>
-      <div class="card-img" :style="{ backgroundImage: 'url(' + item.pic + ')' }"></div>
-      <p class="card-caption">{{ item.caption }}</p>
+      <div class="card-img" :style="{ backgroundImage: 'url(' + item.pic + ')' }">
+        <p class="card-caption">{{ item.caption }}</p>
+      </div>
       <div class="card-info">
         <div class="card-info__likes">
           <p class="card-info__text">Likes</p>
@@ -23,15 +24,21 @@
         </div>
       </div>
       <div class="card-footer">
-        <el-button type="text">Reject</el-button>
-        <el-button type="text">Approve</el-button>
+        <el-button type="text" @click="setStatus('reject')">Reject</el-button>
+        <el-button type="text" @click="setStatus('approve')">Approve</el-button>
       </div>
     </el-card>
   </div>
 </template>
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   props: {
+    campaignId: {
+      required: true,
+      type: Number
+    },
     item: {
       required: true,
       type: Object
@@ -41,14 +48,27 @@ export default {
     return {
       showCaption: false
     };
+  },
+  methods: {
+    ...mapActions(['changeStatus']),
+    setStatus(status) {
+      this.changeStatus({
+        cardId: this.item.id,
+        campaignId: this.campaignId,
+        status
+      });
+    }
+  },
+  mounted() {
+    console.log(this.item);
   }
 }
 </script>
 
-
 <style scoped>
 .container-card {
-  width: 25%;
+  width: calc(25% - 10px);
+  margin: 5px;
   min-width: 300px;
 }
 
@@ -60,10 +80,14 @@ export default {
   background-size: cover;
 }
 .card-caption {
+  display: none;
+  color: white;
   position: absolute;
   z-index: 10;
   width: 300px;
-  top: 450px;
+}
+.card-img:hover .card-caption {
+  display: block;
 }
 
 .card-info,
