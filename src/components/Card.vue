@@ -10,10 +10,8 @@
           </div>
         </div>
       </div>
-      <figure class="card-img">
-        <img :src="item.pic" class="image">
-        <figcaption v-if="showCaption">{{ item.caption }}</figcaption>
-      </figure>
+      <div class="card-img" :style="{ backgroundImage: 'url(' + item.pic + ')' }"></div>
+      <p class="card-caption">{{ item.caption }}</p>
       <div class="card-info">
         <div class="card-info__likes">
           <p class="card-info__text">Likes</p>
@@ -55,12 +53,17 @@ export default {
 }
 
 .card-img {
+  position: relative;
   margin: 0;
-}
-
-.image {
   width: 100%;
   height: 400px;
+  background-size: cover;
+}
+.card-caption {
+  position: absolute;
+  z-index: 10;
+  width: 300px;
+  top: 450px;
 }
 
 .card-info,

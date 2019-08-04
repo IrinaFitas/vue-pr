@@ -7,10 +7,10 @@
     <main class="main">
       <div class="campaign-container__tags">
         <el-button-group>
-          <el-button>Instagram</el-button>
-          <el-button>Youtube</el-button>
-          <el-button>Facebook</el-button>
-          <el-button>Twitter</el-button>
+          <el-button @click="showInstagram">Instagram</el-button>
+          <el-button @click="showYoutube">Youtube</el-button>
+          <el-button @click="showFacebook">Facebook</el-button>
+          <el-button @click="showTwitter">Twitter</el-button>
         </el-button-group>
 
         <div class="campaign-container__tab">
@@ -34,7 +34,8 @@
         </div>
       </div>
       <div class="campaign-cards">
-        <app-card v-for="item in campaign.media" :item="item" :key="item.id"></app-card>
+        <app-card v-for="item in campaignArray" :item="item" :key="item.id"></app-card>
+        <p v-if="!campaignArray.length">Упс! Нет ничего</p>
       </div>
     </main>
   </div>
@@ -50,20 +51,45 @@ export default {
   data() {
     return {
       activeName: "pending",
-      dynamicTags: ["Whatever1", "Whatever2", "Whatever3", "Whatever4"]
+      dynamicTags: ["Whatever1", "Whatever2", "Whatever3", "Whatever4"],
+      campaignArray: []
     };
   },
   computed: {
     campaign() {
       return this.$store.getters.currentCampaign(+this.$route.params.id);
+    },
+    campaignFacebook() {
+      return this.campaign.media.filter(elem => elem.social_network === "Facebook");
+    },
+    campaignInstargam() {
+      return this.campaign.media.filter(elem => elem.social_network === "Instagram");
+    },
+    campaignTwitter() {
+      return this.campaign.media.filter(elem => elem.social_network === "Twitter");
+    },
+    campaignYoutube() {
+      return this.campaign.media.filter(elem => elem.social_network === "Youtube");
     }
   },
   mounted() {
-    console.log(this.campaign.media);
+    this.campaignArray = this.campaign.media;
   },
   methods: {
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+    showFacebook() {
+      this.campaignArray = this.campaignFacebook;
+    },
+    showInstagram() {
+      this.campaignArray = this.campaignInstargam;
+    },
+    showTwitter() {
+      this.campaignArray = this.campaignTwitter;
+    },
+    showYoutube() {
+      this.campaignArray = this.campaignYoutube;
     }
   }
 }
