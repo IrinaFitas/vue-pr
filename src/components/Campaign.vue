@@ -1,41 +1,57 @@
 <template>
   <div class="campaign-container">
     <header class="campaign-container__header">
-      <span @click="showAll">{{ campaign.title }}</span>
+      <span>{{ campaign.title }}</span>
     </header>
 
     <main class="main">
       <div class="campaign-container__tags">
         <el-button-group>
-          <el-button @click="showInstagram">Instagram</el-button>
-          <el-button @click="showYoutube">Youtube</el-button>
-          <el-button @click="showFacebook">Facebook</el-button>
-          <el-button @click="showTwitter">Twitter</el-button>
+          <el-button :class="{ 'is-active': socialFilter === 'Instagram' }" @click="setSocialFilter('Instagram')">Instagram</el-button>
+          <el-button :class="{ 'is-active': socialFilter === 'Youtube' }" @click="setSocialFilter('Youtube')">Youtube</el-button>
+          <el-button :class="{ 'is-active': socialFilter === 'Facebook' }" @click="setSocialFilter('Facebook')">Facebook</el-button>
+          <el-button :class="{ 'is-active': socialFilter === 'Twitter' }" @click="setSocialFilter('Twitter')">Twitter</el-button>
         </el-button-group>
 
         <div class="campaign-container__tab">
-          <el-tabs v-model="activeName">
-            <el-tab-pane label="Pending" name="pending">Pending</el-tab-pane>
-            <el-tab-pane label="Appoved" name="approved">Appoved</el-tab-pane>
-            <el-tab-pane label="Rejected" name="rejected">Rejected</el-tab-pane>
+          <el-tabs v-model="activeName" @tab-click="setStatusFilter">
+            <el-tab-pane label="Pending" name="pending"></el-tab-pane>
+            <el-tab-pane label="Appoved" name="approved"></el-tab-pane>
+            <el-tab-pane label="Rejected" name="rejected"></el-tab-pane>
           </el-tabs>
         </div>
 
-        <div>
-          <el-tag
-            :key="tag"
-            v-for="tag in dynamicTags"
-            closable
-            :disable-transitions="false"
-            @close="handleClose(tag)">
-            {{tag}}
-          </el-tag>
-          <el-button type="primary">Filter</el-button>
+        <div v-if="activeName === 'pending'" class="tags-container">
+          <div class="tags-list">
+            <el-tag
+              :key="tag"
+              v-for="tag in dynamicTags"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)"
+              @blur="handleInputConfirm">
+              {{ tag }}
+            </el-tag>
+            <el-input
+              class="input-new-tag"
+              v-if="inputVisible"
+              v-model="inputValue"
+              ref="saveTagInput"
+              size="mini"
+              @keyup.enter.native="handleInputConfirm">
+            </el-input>
+            <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+          </div>
+          <el-button class="button-filter-by-tags" size="small" type="primary" @click="caption = true">Filter</el-button>
+        </div>
+
+        <div class="campaign-info">
+          <span class="campaign-info__total">{{ campaign.count !== 1 ? `${campaign.count} items total` : `${campaign.count} item total` }}</span>
         </div>
       </div>
       <div class="campaign-cards">
-        <app-card v-for="item in campaignArray" :item="item" :key="item.id" :campaignId="campaign.id"></app-card>
-        <p v-if="!campaignArray.length">Упс! Нет ничего</p>
+        <app-card v-for="item in filteredArray" :item="item" :key="item.id" :campaignId="campaign.id"></app-card>
+        <p v-if="!filteredArray.length">Упс! Нет ничего.</p>
       </div>
     </main>
   </div>
@@ -50,49 +66,70 @@ export default {
   },
   data() {
     return {
+      inputVisible: false,
+      inputValue: '',
       activeName: "pending",
-      dynamicTags: ["Whatever1", "Whatever2", "Whatever3", "Whatever4"],
-      campaignArray: []
+      dynamicTags: [],
+      socialFilter: null,
+      statusFilter: 'pending',
+      caption: false
     };
   },
   computed: {
     campaign() {
       return this.$store.getters.currentCampaign(+this.$route.params.id);
     },
-    campaignFacebook() {
-      return this.campaign.media.filter(elem => elem.social_network === "Facebook");
-    },
-    campaignInstargam() {
-      return this.campaign.media.filter(elem => elem.social_network === "Instagram");
-    },
-    campaignTwitter() {
-      return this.campaign.media.filter(elem => elem.social_network === "Twitter");
-    },
-    campaignYoutube() {
-      return this.campaign.media.filter(elem => elem.social_network === "Youtube");
+    filteredArray() {
+      if (this.socialFilter && !this.caption) {
+        return this.campaign.media
+          .filter(e => e.status === this.statusFilter)
+          .filter(e => e.social_network === this.socialFilter);
+      } else if (!this.socialFilter && this.caption) {
+        this.caption = false;
+
+        return this.campaign.media
+          .filter(e => e.status === this.statusFilter)
+          .filter(e => this.dynamicTags.find(item => e.caption.includes(item)));
+      } else if (this.socialFilter && this.caption) {
+        this.caption = false;
+
+        return this.campaign.media
+          .filter(e => e.status === this.statusFilter)
+          .filter(e => e.social_network === this.socialFilter)
+          .filter(e => this.dynamicTags.find(item => e.caption.includes(item)));
+      } else {
+        return this.campaign.media
+          .filter(e => e.status === this.statusFilter);
+      }
     }
-  },
-  mounted() {
-    this.campaignArray = this.campaign.media;
   },
   methods: {
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
     },
-    showFacebook() {
-      this.campaignArray = this.campaignFacebook;
+    setSocialFilter(social) {
+      this.dynamicTags = [];
+
+      this.socialFilter = social;
+      this.activeName = 'pending';
+      this.setStatusFilter({ name: 'pending' });
     },
-    showInstagram() {
-      this.campaignArray = this.campaignInstargam;
+    setStatusFilter({ name }) {
+      this.statusFilter = name;
     },
-    showTwitter() {
-      this.campaignArray = this.campaignTwitter;
+    showInput() {
+      this.inputVisible = true;
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
     },
-    showYoutube() {
-      this.campaignArray = this.campaignYoutube;
-    },
-    showAll() {
-      this.campaignArray = this.campaign.media;
+    handleInputConfirm() {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        this.dynamicTags.push(inputValue);
+      }
+      this.inputVisible = false;
+      this.inputValue = '';
     }
   }
 }
@@ -100,6 +137,21 @@ export default {
 
 
 <style scoped>
+.tags-container {
+  display: flex;
+}
+.tags-list {
+  width: calc(100% - 150px);
+}
+.tags-list .el-tag {
+  margin-right: 10px;
+}
+.input-new-tag {
+  width: 90px;
+}
+.button-filter-by-tags {
+  width: 150px;
+}
 .campaign-container {
   margin-top: 20px;
 }
@@ -120,6 +172,10 @@ export default {
 
 .campaign-container__tab {
   padding: 15px 0;
+}
+
+.campaign-info {
+  margin-top: 15px;
 }
 
 .campaign-cards {

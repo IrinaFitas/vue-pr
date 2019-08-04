@@ -17,7 +17,9 @@ export const store = new Vuex.Store({
       state.campaigns = payload;
     },
     changeStatus: (state, { campaignId, cardId, status }) => {
-      const card = state.campaigns.find(elem => elem.id === campaignId).media.find(elem => elem.id === cardId);
+      const card = state.campaigns
+        .find(elem => elem.id === campaignId).media
+        .find(elem => elem.id === cardId);
 
       card.status = status;
     }

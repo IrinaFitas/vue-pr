@@ -32,7 +32,6 @@ export default {
 }
 .list-campaigns__item {
   margin-bottom: 10px;
-  padding: 15px;
   font-size: 20px;
   font-weight: bold;
   box-shadow: 0 0 3px #0000e6;
@@ -42,6 +41,8 @@ export default {
   background-color: #e6e6ff;
 }
 .list-campaigns__item a {
+  display: block;
+  padding: 15px;
   text-decoration: none;
   color: #2c3e50;
 }
