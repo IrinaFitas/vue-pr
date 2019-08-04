@@ -1,7 +1,7 @@
 <template>
   <div class="campaign-container">
     <header class="campaign-container__header">
-      <span>{{ campaign.title }}</span>
+      <span @click="showAll">{{ campaign.title }}</span>
     </header>
 
     <main class="main">
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="campaign-cards">
-        <app-card v-for="item in campaignArray" :item="item" :key="item.id"></app-card>
+        <app-card v-for="item in campaignArray" :item="item" :key="item.id" :campaignId="campaign.id"></app-card>
         <p v-if="!campaignArray.length">Упс! Нет ничего</p>
       </div>
     </main>
@@ -90,6 +90,9 @@ export default {
     },
     showYoutube() {
       this.campaignArray = this.campaignYoutube;
+    },
+    showAll() {
+      this.campaignArray = this.campaign.media;
     }
   }
 }
@@ -106,6 +109,9 @@ export default {
   box-sizing: border-box;
   box-shadow: 1px 1px 3px grey;
   font-weight: bold;
+}
+.campaign-container__header span {
+  cursor: pointer;
 }
 
 .campaign-container__tags {
